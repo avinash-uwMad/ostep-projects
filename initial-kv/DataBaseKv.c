@@ -191,7 +191,7 @@ int main(int argc, char *argv[])
 
     if(argc < 2)
     {
-        printf("Required input Params are not enough, Please check again! \n");
+        printf("bad command\n");
         return -1;
     }
     int Itr = 1;
@@ -225,7 +225,8 @@ int main(int argc, char *argv[])
         //printf("%d -> ",TaskType);
         if(TaskType == 1)
         {
-            InsertDB(element);
+            if((element.key!= NULL) && (element.arString!=NULL))
+                InsertDB(element);
             //printf("%s -> %s \n",element.key, element.arString);
             element.key = NULL;
 
@@ -237,6 +238,7 @@ int main(int argc, char *argv[])
         {
             char *tempString = strsep(strgp,",");
             //printf("%s \n",tempString);
+            uint8_t PrintFlag=0;
             if(ArgCount==1)
             {
                 if(strcmp(tempString,"p")==0)
@@ -269,6 +271,15 @@ int main(int argc, char *argv[])
                     //InitDataBase();
                     ArgCount++;
                 }
+                else
+                {
+                    if(PrintFlag==0)
+                    {
+                        PrintFlag=1;
+                        printf("bad command\n");
+                    }
+                    ArgCount++;
+                }
             }
             else if(ArgCount == 2)
             {
@@ -279,11 +290,19 @@ int main(int argc, char *argv[])
                 }
                 else if(TaskType==4)
                 {
-                   printf("Invalid Arguments for clear\n");
+                    if(PrintFlag==0)
+                    {
+                        PrintFlag=1;
+                        printf("bad command\n");
+                    }
                 }
                 else if(TaskType==5)
                 {
-                   printf("Invalid Arguments for PrintAll\n");
+                    if(PrintFlag==0)
+                    {
+                        PrintFlag=1;
+                        printf("bad command\n");
+                    }
                 }
                 ArgCount++;
             }
@@ -297,19 +316,39 @@ int main(int argc, char *argv[])
                 }
                 if(TaskType==2)
                 {
-                    printf("Invalid Arguments for Search and Print\n");
+                    if(PrintFlag==0)
+                    {
+                        PrintFlag=1;
+                        printf("bad command\n");
+                    }
                 }
                 if(TaskType==3)
                 {
-                    printf("Invalid Arguments for Search and Delete\n");
+                    if(PrintFlag==0)
+                    {
+                        PrintFlag=1;
+                        printf("bad command\n");
+                    }
                 }
+                ArgCount++;
             }
             else
             {
-                printf("bad command\n");
+                if(PrintFlag==0)
+                {
+                    PrintFlag=1;
+                    printf("bad command\n");
+                }
             }
 
             //printf("%s ",tempString);
+        }
+        if(TaskType==1)
+        {
+            if((ArgCount<4))
+            {
+               printf("bad command\n"); 
+            }
         }
         if(TaskType==2)
         {
@@ -332,7 +371,7 @@ int main(int argc, char *argv[])
         //printf("%s \n",tempString);
         //printf("%s \n",*strgp);
     }
-    if(element.key!= NULL)
+    if((element.key!= NULL) && (element.arString!=NULL))
     {
         if(TaskType==1)
         {
