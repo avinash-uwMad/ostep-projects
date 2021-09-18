@@ -46,7 +46,7 @@ void PrintAll()
     }
     fclose(fpointer);
 }
-uint8_t CheckComma(char *str)
+u_int8_t CheckComma(char *str)
 {
     int len = strlen(str);
 
@@ -73,7 +73,7 @@ void stringAppend(char *str1,char *str2)
     str1[len1+len2+1] = '\0';
 
 }
-uint8_t Comparekey(char *temp,char *key)
+u_int8_t Comparekey(char *temp,char *key)
 {
     char string[256];
     int i=0;
@@ -88,12 +88,12 @@ uint8_t Comparekey(char *temp,char *key)
     else
         return 0;
 }
-uint8_t SearchAndUpdateDB(char *key,char* arbiString,int type)
+u_int8_t SearchAndUpdateDB(char *key,char* arbiString,int type)
 {
     FILE *originalFile,*tempFile;
     originalFile = fopen("DB_File.txt","r");
     //char *string = malloc( sizeof(char) * ( 500 + 1 ) );
-    uint8_t flag=0;
+    u_int8_t flag=0;
     char string[500];
     int len = strlen(key);
     if(len==0)
@@ -111,7 +111,10 @@ uint8_t SearchAndUpdateDB(char *key,char* arbiString,int type)
     {
         int tempLen = strlen(string);
         if((tempLen != 0) && (Comparekey(string,key)==1) && (type == 1))
-            continue;
+	{   
+	    flag=1;	
+	    continue;
+	}
         else if((tempLen != 0) && (Comparekey(string,key)==1) && (type==2))
         {
             //Update the existing Arbirary string with new one
@@ -146,7 +149,7 @@ uint8_t SearchAndUpdateDB(char *key,char* arbiString,int type)
 }
 void SearchDB(char *key)
 {
-    //uint8_t isFound = 0;
+    //u_int8_t isFound = 0;
     FILE *fpointer;
     fpointer = fopen("DB_File.txt","r");
     char string[500];
@@ -158,19 +161,21 @@ void SearchDB(char *key)
         int tempLen = strlen(string);
         if((tempLen != 0) && (Comparekey(string,key)==1))
         {
-            printf("%s \n",string);
+            printf("%s\n",string);
             fclose(fpointer);
             return;
             
         }
     }
-    printf("K not found\n");
+    printf("%s not found\n",key);
     fclose(fpointer);
 
 }
 void InsertDB(struct DataBase element)
 {
-    uint8_t flag = SearchAndUpdateDB(element.key,element.arString,2);
+    	
+    u_int8_t flag = SearchAndUpdateDB(element.key,element.arString,2);
+
     if(flag==1)
         return ;
 
@@ -191,12 +196,12 @@ int main(int argc, char *argv[])
 
     if(argc < 2)
     {
-        printf("bad command\n");
-        return -1;
+        //printf("bad command\n");
+        return 0;;
     }
     int Itr = 1;
-    uint8_t ArgCount = 1;
-    uint8_t TaskType = 6;
+    u_int8_t ArgCount = 1;
+    u_int8_t TaskType = 6;
     struct DataBase element;
     //FILE *fpointer;
     for(Itr = 1; Itr < argc ; Itr++)
@@ -205,7 +210,7 @@ int main(int argc, char *argv[])
         //printf("*  %s  *\n",argv[Itr]);
         //Check if the String Contains Comma, 
         //If it does not have a comma and not a First Commad it can be a second name.
-        uint8_t FlagComma = CheckComma(argv[Itr]);
+        u_int8_t FlagComma = CheckComma(argv[Itr]);
         if(FlagComma == 0)
         {
             if(TaskType == 1)
@@ -238,7 +243,7 @@ int main(int argc, char *argv[])
         {
             char *tempString = strsep(strgp,",");
             //printf("%s \n",tempString);
-            uint8_t PrintFlag=0;
+            u_int8_t PrintFlag=0;
             if(ArgCount==1)
             {
                 if(strcmp(tempString,"p")==0)
@@ -286,7 +291,20 @@ int main(int argc, char *argv[])
                 if((TaskType==1)||(TaskType==2)||(TaskType==3))
                 {
                    //printf("%d ",atoi(tempString));
-                   element.key = tempString;
+		   char *endptr;
+                   long int Key = strtol(tempString, &endptr,10);
+		   if(Key!=0)
+		       element.key = tempString;
+		   else if((Key==0) && (tempString != NULL) && (endptr==NULL))
+                   	element.key = tempString;
+		   else
+		   {
+		        if(PrintFlag==0)
+                        {
+                            PrintFlag=1;
+                            printf("bad command\n");
+                        }
+		   }
                 }
                 else if(TaskType==4)
                 {
@@ -356,7 +374,10 @@ int main(int argc, char *argv[])
         }
         if(TaskType==3)
         {
-            SearchAndUpdateDB(element.key,NULL,1);
+	    if(SearchAndUpdateDB(element.key,NULL,1)!=1)
+            {
+                printf("%s not found\n",element.key);
+            }
         }     
         if(TaskType==4)
         {
