@@ -183,7 +183,7 @@ void InsertDB(struct DataBase element)
     fpointer = fopen("DB_File.txt","a");
     if(fpointer == NULL )
     {
-        printf( "Could Not Load DataBase \n" ) ;
+        //printf( "Could Not Load DataBase \n" );
     } 
     fprintf(fpointer,"%s,%s\n",element.key,element.arString);
     fclose(fpointer);
@@ -203,7 +203,13 @@ int main(int argc, char *argv[])
     u_int8_t ArgCount = 1;
     u_int8_t TaskType = 6;
     struct DataBase element;
-    //FILE *fpointer;
+    FILE *fTestpointer;
+    fTestpointer = fopen("DB_File.txt","r");
+    if(fTestpointer == NULL)
+    {
+	fTestpointer = fopen("DB_File.txt","w");
+    }
+    fclose(fTestpointer);
     for(Itr = 1; Itr < argc ; Itr++)
     {
         char **strgp = &argv[Itr];
@@ -238,12 +244,12 @@ int main(int argc, char *argv[])
         }
         ArgCount = 1;
         TaskType = 6;
-
+        u_int8_t PrintFlag=0;;
         while(*strgp!=NULL)
         {
             char *tempString = strsep(strgp,",");
             //printf("%s \n",tempString);
-            u_int8_t PrintFlag=0;
+            PrintFlag=0;
             if(ArgCount==1)
             {
                 if(strcmp(tempString,"p")==0)
@@ -330,7 +336,6 @@ int main(int argc, char *argv[])
                 if(TaskType==1)
                 {
                     element.arString = tempString;
-                    ArgCount++;
                 }
                 if(TaskType==2)
                 {
@@ -370,14 +375,24 @@ int main(int argc, char *argv[])
         }
         if(TaskType==2)
         {
-            SearchDB(element.key);
+            if((ArgCount<3))
+	    {
+		printf("bad command\n");
+            }
+	    else if(PrintFlag == 0)
+                SearchDB(element.key);
         }
         if(TaskType==3)
         {
-	    if(SearchAndUpdateDB(element.key,NULL,1)!=1)
-            {
-                printf("%s not found\n",element.key);
+            if((ArgCount<3))
+	    {       
+                printf("bad command\n");
             }
+            else if(PrintFlag == 0)
+	    {
+		if(SearchAndUpdateDB(element.key,NULL,1)!=1)
+		    printf("%s not found\n",element.key);
+	    }	    
         }     
         if(TaskType==4)
         {
